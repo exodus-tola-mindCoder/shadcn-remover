@@ -38,7 +38,7 @@
 </p>
 
 <p align="center">
-  <img src="./assets/demo (3).gif" alt="Demo of shadcn-remover" width="600">
+  <img src="./assets/demo.gif" alt="Demo of shadcn-remover" width="600">
 </p>
 
 
