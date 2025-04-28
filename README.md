@@ -10,7 +10,7 @@
 **A simple command-line tool to quickly remove Shadcn UI components from your project.**
 
 <!-- Optional: Add a Logo/Banner Image Here -->
-<!-- ![shadcn-remover Logo](link/to/your/logo.png) -->
+![shadcn-remover Logo](./assets/logo.jpg)
 
 <!-- Optional: Add a GIF Demo Here -->
 <!-- ![shadcn-remover Demo](link/to/your/demo.gif) -->
@@ -20,6 +20,8 @@ This CLI tool helps you clean up your project by removing specified Shadcn UI co
 ---
 
 ## ✨ Features
+
+---
 
 * **Remove Specific Components:** Target one or more components by name.
 * **Remove All Components:** Option to remove all detected components at once.
