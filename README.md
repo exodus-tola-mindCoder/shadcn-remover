@@ -38,8 +38,9 @@
 </p>
 
 <p align="center">
-  <video src="./assets/demo.mp4" controls width="600"></video>
+  <img src="./assets/demo (3).gif" alt="Demo of shadcn-remover" width="600">
 </p>
+
 
 ---
 
