@@ -1,31 +1,33 @@
 {
   "name": "shadcn-remover",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A CLI tool to remove Shadcn UI components from your project",
   "bin": {
-    "shadcn-remover": "index.ts"
+    "shadcn-remover": "dist/index.js"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
   "files": [
-    "index.js",
+    "dist",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "start": "node index.js",
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YourUsername/shadcn-remover.git"
+    "url": "https://github.com/exodus-tola-mindCoder/shadcn-remover.git"
   },
-  "homepage": "https://github.com/YourUsername/shadcn-remover#readme",
+  "homepage": "https://github.com/exodus-tola-mindCoder/shadcn-remover/blob/master/READ.md",
   "bugs": {
-    "url": "https://github.com/YourUsername/shadcn-remover/issues"
+    "url": "https://github.com/exodus-tola-mindCoder/shadcn-remover/issues"
   },
   "author": {
     "name": "Exodus-Tola",
-    "url": "https://github.com/YourUsername"
+    "url": "https://github.com/exodus-tola-mindCoder"
   },
   "keywords": [
     "cli",
