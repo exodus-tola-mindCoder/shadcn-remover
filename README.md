@@ -33,6 +33,16 @@
 
 ---
 
+<p align="center">
+  <b>🌟 If you find this project helpful, please consider giving it a ⭐ on <a href="https://github.com/exodus-tola-mindCoder/shadcn-remover">GitHub</a>! 🌟</b>
+</p>
+
+<p align="center">
+  <video src="./assets/demo.mp4" controls width="600"></video>
+</p>
+
+---
+
 ## ✨ Features
 
 - **Remove Specific Components:** Target one or more components by name.
