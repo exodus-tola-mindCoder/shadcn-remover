@@ -1,6 +1,6 @@
 {
   "name": "shadcn-remover",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A CLI tool to remove Shadcn UI components from your project",
   "bin": {
     "shadcn-remover": "dist/index.js"
