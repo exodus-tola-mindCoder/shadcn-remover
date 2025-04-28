@@ -1,12 +1,18 @@
 #!/usr/bin/env node
 // a CLI tool to remove Shadcn ui components from a project
 
-import { Command, OptionValues } from 'commander'; // Import OptionValues
+import { Command, OptionValues } from 'commander';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import ora from 'ora';
+import { fileURLToPath } from 'url'; // Import necessary function for __dirname workaround
+
+// --- Start: __dirname workaround for ES Modules ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// --- End: __dirname workaround ---
 
 // Define an interface for the command options
 interface CLIOptions extends OptionValues {
@@ -25,92 +31,82 @@ type RemovedEntityType = 'directory' | 'file' | '';
 const program = new Command();
 
 // Define the expected components directory relative to the current working directory
-// Consider making this configurable in the future (e.g., via tsconfig.json or a command option)
 const COMPONENTS_DIR: string = path.join(process.cwd(), 'src', 'components', 'ui');
 
 // Helper function to check if the components directory exists
-async function checkComponentsDir(): Promise<boolean> { // Added return type
+async function checkComponentsDir(): Promise<boolean> {
   const exists = await fs.pathExists(COMPONENTS_DIR);
   if (!exists) {
     console.error(chalk.red(`❌ Error: Directory not found: ${COMPONENTS_DIR}`));
     console.log(chalk.yellow('Please ensure you are running this command from the root of your project and the path is correct.'));
-    process.exit(1); // Exits the process; consider throwing an error for better composability if this were a library
+    process.exit(1);
   }
   return exists;
 }
 
 // Get a list of all component names (files/dirs) in the components/ui directory
-async function getAllComponents(): Promise<string[]> { // Added return type
-  await checkComponentsDir(); // Ensure directory exists before reading
+async function getAllComponents(): Promise<string[]> {
+  await checkComponentsDir();
   try {
     const entries: string[] = await fs.readdir(COMPONENTS_DIR);
-    // Filter out potential non-component files if necessary, e.g., index files
     return entries
-      .map(entry => entry.replace('.tsx', '')) // Remove .tsx extension if present
-      .filter(entry => !entry.startsWith('.') && entry !== 'index'); // Example filter
-  } catch (error: unknown) { // Type caught error as unknown
+      .map(entry => entry.replace('.tsx', ''))
+      .filter(entry => !entry.startsWith('.') && entry !== 'index');
+  } catch (error: unknown) {
     console.error(chalk.red(`❌ Error reading components directory: ${COMPONENTS_DIR}`));
     if (error instanceof Error) {
-        console.error(error.message); // Log only the message for cleaner output
+        console.error(error.message);
     } else {
-        console.error(error); // Log the raw error if it's not an Error instance
+        console.error(error);
     }
     process.exit(1);
   }
 }
 
 // Remove a specific component (handles both single .tsx file and directory)
-async function removeComponent(componentName: string, dryRun: boolean = false): Promise<void> { // Added parameter types and return type
-  // No need to call checkComponentsDir here again if getAllComponents or the main action already called it.
-  // If called independently, it might be needed.
-
+async function removeComponent(componentName: string, dryRun: boolean = false): Promise<void> {
   const componentFilePath: string = path.join(COMPONENTS_DIR, `${componentName}.tsx`);
   const componentDirPath: string = path.join(COMPONENTS_DIR, componentName);
 
-  let removedPath: string | null = null; // Type can be string or null
-  let removedType: RemovedEntityType = ''; // Use the defined union type
+  let removedPath: string | null = null;
+  let removedType: RemovedEntityType = '';
 
-  // Preferentially check for a directory matching the component name
   if (await fs.pathExists(componentDirPath)) {
     removedPath = componentDirPath;
     removedType = 'directory';
   }
-  // If no directory, check for a .tsx file
   else if (await fs.pathExists(componentFilePath)) {
     removedPath = componentFilePath;
     removedType = 'file';
   }
 
   if (removedPath) {
-    const relativePath = path.relative(process.cwd(), removedPath); // Calculate once
+    const relativePath = path.relative(process.cwd(), removedPath);
     if (dryRun) {
       console.log(chalk.yellow(`[Dry Run] Would remove ${removedType}: ${relativePath}`));
     } else {
       try {
-        await fs.remove(removedPath); // fs-extra remove handles both files and directories
+        await fs.remove(removedPath);
         console.log(chalk.green(`Removed ${removedType}: ${relativePath}`));
-      } catch (error: unknown) { // Type caught error
+      } catch (error: unknown) {
         console.error(chalk.red(`❌ Failed to remove ${removedType}: ${componentName}`));
          if (error instanceof Error) {
             console.error(error.message);
          } else {
             console.error(error);
          }
-        // Re-throw the error to be caught by the main loop's catch block
         throw error;
       }
     }
   } else {
-    // Consider making this a warning instead of red, or handle it in the main loop based on return value
     console.log(chalk.yellow(`❓ Component "${componentName}" not found (checked for ${componentName}.tsx and directory ${componentName})`));
-    // Maybe throw a specific error here if not finding it should count as a failure?
-    // throw new Error(`Component not found: ${componentName}`);
+    // throwing an error if not found should be treated as failure
+    throw new Error(`Component not found: ${componentName}`);
   }
 }
 
 // Simple confirmation prompt
-async function confirm(message: string): Promise<boolean> { // Added parameter type and return type
-  // Ensure @types/inquirer is installed for proper typing
+async function confirm(message: string): Promise<boolean> {
   const { confirmed }: { confirmed: boolean } = await inquirer.prompt([
     {
       type: 'confirm',
@@ -122,123 +118,133 @@ async function confirm(message: string): Promise<boolean> { // Added parameter t
   return confirmed;
 }
 
-program
-  .name('shadcn-remover')
-  .description('Remove Shadcn UI components from your project')
-  .version('1.0.1') // Consider fetching version from package.json
-  .option('-d, --dry-run', 'Show what would be removed without actually removing files', false) // Default value
-  .option('-a, --all', 'Attempt to remove all detected Shadcn UI components', false) // Default value
-  .argument('[components...]', 'Specific component names to remove (e.g., button card dialog)')
-  .action(async (components: string[], options: CLIOptions) => { // Typed arguments and options
-    const { dryRun, all: removeAll } = options; // Destructure options
+// Helper function to read package.json version
+async function getPackageVersion(): Promise<string> {
+  // Construct the path from the compiled JS file in 'dist' up to the root 'package.json'
+  const packageJsonPath = path.join(__dirname, '..', 'package.json');
+  try {
+    // Use fs-extra's readJson which parses the JSON automatically
+    const pkg = await fs.readJson(packageJsonPath);
+    return pkg.version || 'unknown'; // Return version or fallback
+  } catch (error: unknown) {
+    console.warn(chalk.yellow(`⚠️ Could not read version from ${packageJsonPath}.`));
+    // Optionally log the error for debugging: 
+    console.error(error);
+    return 'unknown'; // Fallback version
+  }
+}
 
-    let componentsToDelete: string[] = components; // Explicitly type
 
-    // Determine which components to target
-    if (removeAll) {
-      if (components.length > 0) {
-        console.log(chalk.yellow('Warning: Specific components provided along with --all flag. Ignoring specific components and removing all.'));
-      }
-      // getAllComponents already handles the error case internally by exiting
-      componentsToDelete = await getAllComponents();
-      if (componentsToDelete.length === 0) {
-        console.log(chalk.yellow('🟡 No components found in components/ui directory.'));
-        process.exit(0);
-      }
-      console.log(chalk.blue(`ℹ️ Attempting to remove all ${componentsToDelete.length} detected components.`));
-    } else if (componentsToDelete.length === 0) {
-      // If no components specified via argument or --all, prompt user
-      const allComponents: string[] = await getAllComponents(); // Type the result
-      if (allComponents.length === 0) {
-        console.log(chalk.yellow('🟡 No components found to select from in components/ui directory.'));
-        process.exit(0);
-      }
-      // Use the defined interface for answers
-      const answers: ComponentSelectionAnswers = await inquirer.prompt([
-        {
-          type: 'checkbox',
-          name: 'selectedComponents',
-          message: 'Select components to remove:',
-          choices: allComponents,
-          pageSize: 10,
-        },
-      ]);
-      componentsToDelete = answers.selectedComponents;
-    }
+// --- Main Program Setup and Execution ---
+(async () => {
+  try {
+    const version = await getPackageVersion(); // Fetch version dynamically
 
-    // Exit if nothing is selected
-    if (componentsToDelete.length === 0) {
-      console.log(chalk.yellow('🟡 No components selected or specified for removal. Exiting.'));
-      process.exit(0);
-    }
+    program
+      .name('shadcn-remover')
+      .description('Remove Shadcn UI components from your project')
+      .version(version) // Set version dynamically
+      .option('-d, --dry-run', 'Show what would be removed without actually removing files', false)
+      .option('-a, --all', 'Attempt to remove all detected Shadcn UI components', false)
+      .argument('[components...]', 'Specific component names to remove (e.g., button card dialog)')
+      .action(async (components: string[], options: CLIOptions) => {
+        const { dryRun, all: removeAll } = options;
 
-    // Confirmation step
-    console.log(chalk.cyan(`Selected components: ${componentsToDelete.join(', ')}`));
-    const proceed: boolean = await confirm(
-      dryRun
-        ? `Dry run: Show removal actions for ${componentsToDelete.length} component(s)?`
-        : `⚠️ Are you sure you want to permanently remove ${componentsToDelete.length} component(s)?`
-    );
+        let componentsToDelete: string[] = components;
 
-    if (!proceed) {
-      console.log(chalk.gray('Operation cancelled by user.'));
-      process.exit(0);
-    }
-
-    // Execution step
-    const spinner = ora(dryRun ? 'Simulating component removal...' : 'Removing components...').start();
-    let successCount: number = 0; // Explicit type
-    let failCount: number = 0; // Explicit type
-
-    // Use Promise.allSettled for potentially better concurrency and error handling
-    const results = await Promise.allSettled(
-        componentsToDelete.map(component => removeComponent(component, dryRun))
-    );
-
-    results.forEach(result => {
-        if (result.status === 'fulfilled') {
-            // If removeComponent doesn't throw an error on "not found",
-            // we might need a way to distinguish success from not-found here.
-            // Currently, any non-throwing execution is counted as success.
-            successCount++;
-        } else {
-            // Error was already logged inside removeComponent's catch block
-            failCount++;
-            // Optionally log more context here if needed:
-            // console.error(chalk.red(`Failed processing component: ${result.reason}`));
+        // Determine which components to target
+        if (removeAll) {
+          if (components.length > 0) {
+            console.log(chalk.yellow('Warning: Specific components provided along with --all flag. Ignoring specific components and removing all.'));
+          }
+          componentsToDelete = await getAllComponents(); // Handles internal exit on error
+          if (componentsToDelete.length === 0) {
+            console.log(chalk.yellow('🟡 No components found in components/ui directory.'));
+            process.exit(0);
+          }
+          console.log(chalk.blue(`ℹ️ Attempting to remove all ${componentsToDelete.length} detected components.`));
+        } else if (componentsToDelete.length === 0) {
+          const allComponents: string[] = await getAllComponents(); // Handles internal exit on error
+          if (allComponents.length === 0) {
+            console.log(chalk.yellow('🟡 No components found to select from in components/ui directory.'));
+            process.exit(0);
+          }
+          const answers: ComponentSelectionAnswers = await inquirer.prompt([
+            {
+              type: 'checkbox',
+              name: 'selectedComponents',
+              message: 'Select components to remove:',
+              choices: allComponents,
+              pageSize: 10,
+            },
+          ]);
+          componentsToDelete = answers.selectedComponents;
         }
-    });
 
+        // Exit if nothing is selected
+        if (componentsToDelete.length === 0) {
+          console.log(chalk.yellow('🟡 No components selected or specified for removal. Exiting.'));
+          process.exit(0);
+        }
 
-    // Update spinner based on results
-    if (failCount > 0) {
-      spinner.warn(chalk.yellow(`Completed with ${failCount} error(s). ${successCount} component(s) processed.`));
-    } else if (dryRun) {
-      spinner.succeed(chalk.green(`Dry run complete. ${successCount} component(s) simulated for removal.`));
-    } else {
-      spinner.succeed(chalk.green(`Successfully removed ${successCount} component(s).`));
-    }
+        // Confirmation step
+        console.log(chalk.cyan(`Selected components: ${componentsToDelete.join(', ')}`));
+        const proceed: boolean = await confirm(
+          dryRun
+            ? `Dry run: Show removal actions for ${componentsToDelete.length} component(s)?`
+            : `⚠️ Are you sure you want to permanently remove ${componentsToDelete.length} component(s)?`
+        );
 
-    if (failCount > 0) {
-      process.exit(1); // Exit with error code if any component removal failed
-    }
-  });
+        if (!proceed) {
+          console.log(chalk.gray('Operation cancelled by user.'));
+          process.exit(0);
+        }
 
-// Helper function to read package.json version (Optional but good practice)
-// async function getPackageVersion(): Promise<string> {
-//     try {
-//         const pkg = await fs.readJson(path.join(__dirname, '..', 'package.json')); // Adjust path if needed
-//         return pkg.version || 'unknown';
-//     } catch {
-//         return 'unknown';
-//     }
-// }
+        // Execution step
+        const spinner = ora(dryRun ? 'Simulating component removal...' : 'Removing components...').start();
+        let successCount: number = 0;
+        let failCount: number = 0;
 
-// (async () => {
-//     // const version = await getPackageVersion(); // Fetch version dynamically
-//     // program.version(version); // Set version dynamically
-//     program.parse(process.argv);
-// })(); // Use async IIFE if you need top-level await for version fetching
+        const results = await Promise.allSettled(
+            componentsToDelete.map(component => removeComponent(component, dryRun))
+        );
 
-program.parse(process.argv); // Pass arguments explicitly (Simpler if not fetching version async)
+        results.forEach(result => {
+            if (result.status === 'fulfilled') {
+                // Check if the component was actually found and removed/simulated
+                // This requires removeComponent to potentially return a status or not log "not found" as success
+                // For now, we count any non-error as success.
+                successCount++;
+            } else {
+                // Error was already logged inside removeComponent's catch block
+                failCount++;
+                // Optionally log more context 
+                console.error(chalk.red(`Failed processing component: ${result.reason?.message || result.reason}`));
+            }
+        });
+
+        // Update spinner based on results
+        if (failCount > 0) {
+          spinner.warn(chalk.yellow(`Completed with ${failCount} error(s). ${successCount} component(s) processed.`));
+        } else if (dryRun) {
+          spinner.succeed(chalk.green(`Dry run complete. ${successCount} component(s) simulated for removal.`));
+        } else {
+          spinner.succeed(chalk.green(`Successfully removed ${successCount} component(s).`));
+        }
+
+        if (failCount > 0) {
+          process.exit(1); // Exit with error code if any component removal failed
+        }
+      }); // End of .action()
+
+    // Parse arguments ONLY inside the async IIFE after setup
+    await program.parseAsync(process.argv); // Use parseAsync for async actions
+
+  } catch (error) {
+    // Catch any unexpected errors during setup/parsing
+    console.error(chalk.red('An unexpected error occurred:'), error);
+    process.exit(1);
+  }
+})(); // End of async IIFE
+
 
