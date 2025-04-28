@@ -1,0 +1,55 @@
+{
+  "name": "shadcn-remover",
+  "version": "1.0.1",
+  "description": "A CLI tool to remove Shadcn UI components from your project",
+  "bin": {
+    "shadcn-remover": "index.ts"
+  },
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YourUsername/shadcn-remover.git"
+  },
+  "homepage": "https://github.com/YourUsername/shadcn-remover#readme",
+  "bugs": {
+    "url": "https://github.com/YourUsername/shadcn-remover/issues"
+  },
+  "author": {
+    "name": "Exodus-Tola",
+    "url": "https://github.com/YourUsername"
+  },
+  "keywords": [
+    "cli",
+    "shadcn",
+    "shadcn-ui",
+    "ui",
+    "components",
+    "remove",
+    "delete",
+    "cleanup"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "fs-extra": "^11.3.0",
+    "inquirer": "^12.6.0",
+    "ora": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4"
+  }
+}
