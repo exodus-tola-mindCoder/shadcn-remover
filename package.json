@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/exodus-tola-mindCoder/shadcn-remover.git"
+    "url": "git+https://github.com/exodus-tola-mindCoder/shadcn-remover.git"
   },
   "homepage": "https://github.com/exodus-tola-mindCoder/shadcn-remover/blob/master/READ.md",
   "bugs": {
