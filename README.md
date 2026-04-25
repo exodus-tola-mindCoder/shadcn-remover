@@ -53,7 +53,6 @@
 - **User-Friendly:** Provides clear feedback with progress spinners and colored output.
 - **Safe:** Includes confirmation prompts before deleting files.
 - **Lightweight & Fast:** Built with modern tools for efficiency.
-
 ---
 
 ## ⚙️ Requirements
