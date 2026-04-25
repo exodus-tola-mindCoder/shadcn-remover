@@ -176,5 +176,4 @@ If you find this project helpful, please consider giving it a ⭐ on [GitHub](ht
 ---
 
 ## 📢 Stay Updated
-
 Follow the repository to stay updated with the latest features and improvements. Suggestions and feedback are always welcome!
