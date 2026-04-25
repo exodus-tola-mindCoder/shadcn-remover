@@ -1,4 +1,4 @@
-# shadcn-remover CLI
+# shadcn-remover CLI!.
 
 <!-- Badges -->
 <p align="center">
