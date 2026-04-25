@@ -45,7 +45,6 @@
 ---
 
 ## ✨ Features
-
 - **Remove Specific Components:** Target one or more components by name.
 - **Remove All Components:** Option to remove all detected components at once.
 - **Interactive Mode:** Select components to remove from a list if none are specified.
