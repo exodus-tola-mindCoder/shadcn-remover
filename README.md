@@ -149,7 +149,6 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ---
 
 ## 👤 Author
-
 **Exodus-Tola**
 
 - GitHub: [@exodus-tola-mindCoder](https://github.com/exodus-tola-mindCoder)
