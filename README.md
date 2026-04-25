@@ -34,7 +34,7 @@
 ---
 
 <p align="center">
-  <b>🌟 If you find this project helpful, please consider giving it a ⭐ on <a href="https://github.com/exodus-tola-mindCoder/shadcn-remover">GitHub</a>! 🌟</b>
+  <b>🌟 If you find this project helpful,please consider giving it a ⭐ on <a href="https://github.com/exodus-tola-mindCoder/shadcn-remover">GitHub</a>! 🌟</b>
 </p>
 
 <p align="center">
