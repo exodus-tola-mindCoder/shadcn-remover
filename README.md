@@ -128,9 +128,7 @@ By default, `shadcn-remover` expects your Shadcn UI components to be located in:
 ```
 <your-project-root>/src/components/ui/
 ```
-
 Ensure you run the command from your project's root directory for the path detection to work correctly.
-
 ---
 
 ## 🤝 Contributing
