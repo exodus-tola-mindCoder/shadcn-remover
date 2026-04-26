@@ -165,6 +165,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 ---
 
 ## 🌟 Support
+
 If you find this project helpful, please consider giving it a ⭐ on [GitHub](https://github.com/exodus-tola-mindCoder/shadcn-remover)!
 ---
 
