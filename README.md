@@ -127,11 +127,9 @@ Ensure you run the command from your project's root directory for the path detec
 ---
 
 ## 🤝 Contributing
-
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/exodus-tola-mindCoder/shadcn-remover/issues).
 
 ### Steps to Contribute
-
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
