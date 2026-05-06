@@ -86,11 +86,9 @@ shadcn-remover [components...] [options]
 ```
 
 ### Arguments
-
 - `[components...]`: (Optional) A space-separated list of component names to remove (e.g., `button card dialog`).
 
 ### Options
-
 | Option       | Alias | Description                                              | Default |
 |--------------|-------|----------------------------------------------------------|---------|
 | `--all`      | `-a`  | Attempt to remove all detected Shadcn UI components      | `false` |
@@ -99,7 +97,6 @@ shadcn-remover [components...] [options]
 | `--help`     | `-h`  | Display help information                                 |         |
 
 ### Examples
-
 ```bash
 # Remove specific components (button, alert-dialog, sheet)
 shadcn-remover button alert-dialog sheet
