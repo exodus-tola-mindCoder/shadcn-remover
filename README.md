@@ -45,7 +45,6 @@
 ---
 
 ## ✨ Features
-
 - **Remove Specific Components:** Target one or more components by name.
 - **Remove All Components:** Option to remove all detected components at once.
 - **Interactive Mode:** Select components to remove from a list if none are specified.
@@ -57,14 +56,12 @@
 ---
 
 ## ⚙️ Requirements
-
 - **Node.js:** Version 18.0.0 or higher (`>=18.0.0`)
 - **npm** (or yarn/pnpm)
 
 ---
 
 ## 🚀 Installation
-
 Install the tool **globally** using your preferred package manager:
 
 ```bash
